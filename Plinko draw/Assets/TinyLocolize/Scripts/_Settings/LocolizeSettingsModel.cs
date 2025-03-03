@@ -52,4 +52,18 @@ public class LocolizeSettingsModel
             }
         }
     }
+
+    public int GetLanguageIndexByIsoCode(string isoCode)
+    {
+        for (int i = 0; i < _languages.Length; i++)
+        {
+            if (_languages[i].IsoCode == isoCode)
+            {
+                return i;
+            }
+        }
+
+        Debug.LogError($"Critical error -> unable to find language: '{isoCode}'");
+        return 0;
+    }
 }

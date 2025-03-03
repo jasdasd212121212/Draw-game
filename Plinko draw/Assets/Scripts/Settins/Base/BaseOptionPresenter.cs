@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using System;
 
 public abstract class BaseOptionPresenter<T> : ISaveble<T>
@@ -24,30 +25,56 @@ public abstract class BaseOptionPresenter<T> : ISaveble<T>
     }
 
     protected abstract void Apply(T data);
-    protected abstract T GetDefaultData();
+    protected abstract UniTask<T> GetDefaultData();
+    protected virtual async UniTask<BaseOptionPresenterDataValidationCallback<T>> ValidateDefaultData(T currentDefaultData) 
+    {
+        await UniTask.Delay(0);
+        return new(true, default); 
+    }
 
-    public T GetData()
+    public async UniTask<T> GetData(bool isFirstSave)
     {
         T data;
+        T defaultData = await GetDefaultData();
+        BaseOptionPresenterDataValidationCallback<T> validationCallback = await ValidateDefaultData(defaultData);
 
-        if (_state != null)
+        if (isFirstSave)
         {
-            data = _state;
+            data = defaultData;
+            ApplyData(data);
         }
         else
         {
-            data = GetDefaultData();
+            if (_state != null)
+            {
+                data = _state;
+            }
+            else
+            {
+                data = defaultData;
+                ApplyData(data);
+            }
         }
 
-        return data;
+        if (validationCallback.IsValid == false)
+        {
+            ApplyData(validationCallback.Data);
+        }
+
+        return validationCallback.IsValid ? data : validationCallback.Data;
     }
 
     public void SetData(T data)
     {
+        _state = View.State;
+        ApplyData(data);
+        loaded?.Invoke();
+    }
+
+    private void ApplyData(T data)
+    {
         Apply(data);
         View.Display(data);
-
-        loaded?.Invoke();
     }
 
     private void OnViewChanged()

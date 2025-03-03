@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -98,8 +99,9 @@ public class SkinSystemModel : ISaveble<SkinSystemSaveData>
         return false;
     }
 
-    public SkinSystemSaveData GetData()
+    public async UniTask<SkinSystemSaveData> GetData(bool isFirstLoad)
     {
+        await UniTask.Delay(0);
         return new SkinSystemSaveData(_hasSkin, _currentSkinIndex, _skinsIndexes.ToArray());
     }
 

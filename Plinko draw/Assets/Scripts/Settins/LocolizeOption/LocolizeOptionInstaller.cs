@@ -6,6 +6,8 @@ public class LocolizeOptionInstaller : BaseOptionInstaller<IntDataTransferObject
     [SerializeField] private LocolizeOptionView _view;
 
     [Inject] private LocolizeSettingsModel _model;
+    [Inject] private EnvironmentFacade _environmentFacade;
+    [Inject] private LocolizeSettingsModel _locolize;
 
     protected override string GetKey()
     {
@@ -14,7 +16,7 @@ public class LocolizeOptionInstaller : BaseOptionInstaller<IntDataTransferObject
 
     protected override BaseOptionPresenter<IntDataTransferObject> GetPresenter()
     {
-        return new LocolizeOptionPresenter(_view, _model);
+        return new LocolizeOptionPresenter(_view, _model, _environmentFacade, _locolize);
     }
 
     protected override IntDataTransferObject GetSelfData()

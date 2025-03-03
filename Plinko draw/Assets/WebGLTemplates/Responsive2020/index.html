@@ -91,6 +91,9 @@
       var startAdsIsOpened = false;
       var gameIsStarted = false;
 
+      var spacing = 20;
+      var mobileSpacingPercent = 10.7;
+
       const script = document.createElement("script");
       script.src = loaderUrl;
       script.onload = () => {
@@ -116,12 +119,18 @@
       };
       document.body.appendChild(script);
 
+      document.oncontextmenu = function(e) {
+          return false;
+      }
+
       YaGames
         .init()
         .then(ysdk => {
             console.log('Yandex SDK initialized');
             window.ysdk = ysdk;
             
+            CallLanguage();
+
             startAdsIsOpened = true;
 
             ysdk.adv.showFullscreenAdv({
@@ -205,6 +214,18 @@
           gameIsStarted = true;
         }
 
+        function CallLanguage() {
+          var language = ysdk.environment.i18n.lang;
+
+          console.log("Defined language -> Backend: " + language);
+
+          gameInstance.SendMessage('WebLanguageCollector', 'SetLanguage', "" + language)
+        }
+
+        function getPercent (target, percent) {
+            return (target / 100) * percent;
+        }
+
       setInterval(function name(params) {
           var initW = initialWidthCanvas;
           var initH = initialHeightCanvas;
@@ -214,10 +235,10 @@
           var scale = Math.min(winW / initW, winH / initH);
 
           if(winW > winH){
-            document.getElementById("unity-canvas").width = (Math.round(initW * scale * 100) / 100) - 20;
+            document.getElementById("unity-canvas").width = (Math.round(initW * scale * 100) / 100) - spacing;
           }
           else{
-            document.getElementById("unity-canvas").width = winW;
+            document.getElementById("unity-canvas").width = winW - getPercent(winW, mobileSpacingPercent);;
           }
 
       }, 100);

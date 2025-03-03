@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using System;
 using UnityEngine;
 
@@ -51,8 +52,9 @@ public class LevelProgressModel : ISaveble<LevelProgressSaveData>
         dataChecnged?.Invoke();
     }
 
-    public LevelProgressSaveData GetData()
+    public async UniTask<LevelProgressSaveData> GetData(bool isFirstLoad)
     {
+        await UniTask.Delay(0);
         return new LevelProgressSaveData(_maxCompleatedLevelIndex, _currentLevelIndex);
     }
 

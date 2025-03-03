@@ -13,7 +13,7 @@ public class SaverComponent<T>
         _system = savingSystem;
         _saveKey = saveKey;
 
-        _target.dataChecnged += Save;
+        _target.dataChecnged += OnDataChanged;
 
         Load().Forget();
     }
@@ -22,24 +22,32 @@ public class SaverComponent<T>
     {
         if (_target != null)
         {
-            Save();
-            _target.dataChecnged -= Save;
+            Save(false).Forget();
+            _target.dataChecnged -= OnDataChanged;
         }
     }
 
-    private void Save()
+    private void OnDataChanged()
     {
-        _system.Save(_saveKey, _target.GetData());
+        Save(false).Forget();
+    }
+
+    private async UniTask Save(bool isFirstSave)
+    {
+        T data = await _target.GetData(isFirstSave);
+
+        await _system.Save(_saveKey, data);
     }
 
     private async UniTask Load()
     {
         if (await _system.HasKey(_saveKey) == false)
         {
-            Save();
+            await Save(true);
             return;
-        }
+        } 
 
         _target.SetData(await _system.Load<T>(_saveKey));
+        await Save(false);
     }
 }

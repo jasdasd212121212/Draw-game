@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using System;
 using UnityEngine;
 
@@ -32,8 +33,9 @@ public class WalletModel : ISaveble<WalletSaveData>
         dataChecnged?.Invoke();
     }
 
-    public WalletSaveData GetData()
+    public async UniTask<WalletSaveData> GetData(bool isFirstLoad)
     {
+        await UniTask.Delay(0);
         return new WalletSaveData(Money);
     }
 
